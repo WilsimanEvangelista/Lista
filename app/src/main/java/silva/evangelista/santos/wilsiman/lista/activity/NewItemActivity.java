@@ -25,22 +25,29 @@ public class NewItemActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_item);
-
+        //Obtenção do ImageButton
         ImageButton imgCl = findViewById(R.id.imbCl);
+        //Definição de um ouvidor de cliques no ImageButton
         imgCl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+            //Execução da abertura de galeria para escolha da foto
+                //Intent implícito
                 Intent photoPickerIntent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                //Setar intent para informar que estamos interessados apenas em documentos com mimetype "image/*"
                 photoPickerIntent.setType("image/*");
+                //Executar o intent atrvés do método (O resultado é a imagem selecionada)
                 startActivityForResult(photoPickerIntent, PHOTO_PICKER_REQUEST);
             }
         });
 
+        //Obtenção do button
         Button btnAddItem = findViewById(R.id.btnAddItem);
-
+        //Setar um ouvidor de cliques
         btnAddItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //Verificação se os campos foram preenchidos pelos usuários
                 if (photoSelected == null) {
                     Toast.makeText(NewItemActivity.this, "É necessário selecionar uma imagem!", Toast.LENGTH_LONG).show();
                     return;
@@ -60,23 +67,35 @@ public class NewItemActivity extends AppCompatActivity {
                     return;
                 }
 
+            //Como uma activity pode retornar dados para a Activity que chamou
+                //Criação do Intent - Serve para guardar os dados a serem retornados para MainActivity
                 Intent i = new Intent();
+                //Setamos o Uri da imagem escolhida dentro do intent
                 i.setData(photoSelected);
+                //Setamos o título e a descrição
                 i.putExtra("title",title);
                 i.putExtra("description", description);
+                //Usamos o método setResult para indicar o resultado da Activity - O código RESULT_OK indica que há dados de retorno
                 setResult(Activity.RESULT_OK, i);
+                //Activity é finalizada
                 finish();
             }
         });
     }
 
     @Override
+    //Passa três parâmetros (requestCode = qual chamada de startActivity essa resposta se refere; resultCode = Retorna se a Activity de destino retornou com sucesso ou não; data = Intent que contém os dados retornados pela Activity de destino;
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        //Verifica se requestCode é referente ao fornecido na chamada de startActivity com id PHOTO...
         if (requestCode == PHOTO_PICKER_REQUEST) {
+            //Verifica se resultCode é um código de sucesso
             if (resultCode == Activity.RESULT_OK) {
+                //Obtenção do Uri da imagem e guardar no atributo de classe photoSelected
                 photoSelected = data.getData();
+                //Obtenção de ImageView
                 ImageView imvfotoPreview = findViewById(R.id.imvPhotoPreview);
+                //Setar o Uri no ImageView para que foto seja exibida
                 imvfotoPreview.setImageURI(photoSelected);
             }
         }
