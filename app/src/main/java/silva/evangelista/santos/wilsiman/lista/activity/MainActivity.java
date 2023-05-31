@@ -1,23 +1,29 @@
 package silva.evangelista.santos.wilsiman.lista.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
 import silva.evangelista.santos.wilsiman.lista.R;
 import silva.evangelista.santos.wilsiman.lista.adapter.MyAdapter;
+import silva.evangelista.santos.wilsiman.lista.model.MainActivityViewModel;
 import silva.evangelista.santos.wilsiman.lista.model.MyItem;
+import silva.evangelista.santos.wilsiman.lista.util.Util;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -30,12 +36,29 @@ public class MainActivity extends AppCompatActivity {
         //Verificação se as condições de retorno foram cumpridas
         if (requestCode == NEW_ITEM_REQUEST) {
             if (resultCode == Activity.RESULT_OK) {
+
                 //Criação de myItem para guardar os dados do item
                 MyItem myItem = new MyItem();
                 //Obtenção dos dados retornados por NewItemActivity e os guardamos em myItem
                 myItem.title = data.getStringExtra("title");
                 myItem.description = data.getStringExtra("description");
-                myItem.photo = data.getData();
+                Uri selectedPhotoURI = data.getData();
+
+                try {
+                    //A função abaixo esta presente no arquivo Util.java. Esta carrega a imagem e a
+                    // guarda dentro de um Bitmap. Assim cria-se uma copia da imagem original e não
+                    // precisaremos de usar o endereco Uri
+                    Bitmap photo = Util.getBitmap(MainActivity.this, selectedPhotoURI,100,100);
+                    //Abaixo guardamos o Bitmap da imagem dentro de um objeto do tipo MyItem
+                    myItem.photo = photo;
+                //Caso o arquivo da imagem não seja encontrado o catch é disparado
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+
+                MainActivityViewModel vm = new ViewModelProvider(this).get(MainActivityViewModel.class);
+                List<MyItem> items = vm.getItens();
+
                 //Adição dos itens à uma lista de itens
                 itens.add(myItem);
                 //Para que o novo item seja mostrado no RecycleView, o Adapter precisa ser notificado
@@ -45,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     MyAdapter myAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,6 +87,12 @@ public class MainActivity extends AppCompatActivity {
         });
         //Obtenção do RecycleView
         RecyclerView rvItens = findViewById(R.id.rvItens);
+        MainActivityViewModel vm = new ViewModelProvider(this).get(MainActivityViewModel.class);
+        List<MyItem> items = vm.getItens();
+
+        myAdapter = new MyAdapter(this,itens);
+        rvItens.setAdapter(myAdapter);
+
         //Criação do myAdapter e é setado no RecycleView
         myAdapter = new MyAdapter(this,itens);
         rvItens.setAdapter(myAdapter);
