@@ -2,6 +2,7 @@ package silva.evangelista.santos.wilsiman.lista.activity;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -15,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import silva.evangelista.santos.wilsiman.lista.R;
+import silva.evangelista.santos.wilsiman.lista.model.NewItemActivityViewModel;
 
 public class NewItemActivity extends AppCompatActivity {
 
@@ -25,6 +27,15 @@ public class NewItemActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_item);
+
+        NewItemActivityViewModel vm = new ViewModelProvider(this).get(NewItemActivityViewModel.class);
+
+        Uri selectPhotoLocation = vm.getSelectPhotoLocation();
+        if (selectPhotoLocation != null) {
+            ImageView imvfotoPreview = findViewById(R.id.imvPhotoPreview);
+            imvfotoPreview.setImageURI(selectPhotoLocation);
+        }
+
         //Obtenção do ImageButton
         ImageButton imgCl = findViewById(R.id.imbCl);
         //Definição de um ouvidor de cliques no ImageButton
@@ -91,12 +102,14 @@ public class NewItemActivity extends AppCompatActivity {
         if (requestCode == PHOTO_PICKER_REQUEST) {
             //Verifica se resultCode é um código de sucesso
             if (resultCode == Activity.RESULT_OK) {
-                //Obtenção do Uri da imagem e guardar no atributo de classe photoSelected
-                photoSelected = data.getData();
+                Uri photoSelected = data.getData();
                 //Obtenção de ImageView
                 ImageView imvfotoPreview = findViewById(R.id.imvPhotoPreview);
                 //Setar o Uri no ImageView para que foto seja exibida
                 imvfotoPreview.setImageURI(photoSelected);
+
+                NewItemActivityViewModel vm = new ViewModelProvider(this).get(NewItemActivityViewModel.class);
+                vm.setSelectPhotoLocation(photoSelected);
             }
         }
     }

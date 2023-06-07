@@ -28,7 +28,7 @@ import silva.evangelista.santos.wilsiman.lista.util.Util;
 public class MainActivity extends AppCompatActivity {
 
     static int NEW_ITEM_REQUEST = 1;
-    List<MyItem> itens = new ArrayList<>();
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -56,7 +56,9 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
+                // O ViewModel referente a MainActivity(MainActivityViewModel) é obtido
                 MainActivityViewModel vm = new ViewModelProvider(this).get(MainActivityViewModel.class);
+                // A lista de itens é obtida a partir do ViewModel e repassada para o Adapter
                 List<MyItem> items = vm.getItens();
 
                 //Adição dos itens à uma lista de itens
@@ -68,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     MyAdapter myAdapter;
+    List<MyItem> itens = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,7 +90,10 @@ public class MainActivity extends AppCompatActivity {
         });
         //Obtenção do RecycleView
         RecyclerView rvItens = findViewById(R.id.rvItens);
+
+        // O ViewModel referente a MainActivity(MainActivityViewModel) é obtido
         MainActivityViewModel vm = new ViewModelProvider(this).get(MainActivityViewModel.class);
+        // A lista de itens é obtida a partir do ViewModel e repassada para o Adapter
         List<MyItem> items = vm.getItens();
 
         myAdapter = new MyAdapter(this,itens);
